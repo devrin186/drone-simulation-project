@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- ========================================= -->
+  <!-- ARGUMENTS                                 -->
+  <!-- ========================================= -->
+  <arg name="control_mode" default="keyboard"/>
+  <!-- Options: keyboard, autonomous -->
+
+  <!-- ========================================= -->
+  <!-- CONTROL NODES                             -->
+  <!-- ========================================= -->
+  
+  <!-- Keyboard Control -->
+  <group if="$(eval control_mode == 'keyboard')">
+    <node name="keyboard_control" 
+          pkg="drone_project" 
+          type="keyboard_control.py" 
+          output="screen"
+          launch-prefix="xterm -e"/>
+  </group>
+  
+  <!-- Autonomous Control -->
+  <group if="$(eval control_mode == 'autonomous')">
+    <node name="drone_controller" 
+          pkg="drone_project" 
+          type="drone_controller.py" 
+          output="screen"/>
+  </group>
+
+</launch>

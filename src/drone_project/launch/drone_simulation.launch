@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- ========================================= -->
+  <!-- ARGUMENTS                                 -->
+  <!-- ========================================= -->
+  <arg name="world_name" default="$(find drone_project)/worlds/empty.world"/>
+  <arg name="robot_name" default="quadrotor"/>
+  <arg name="enable_logging" default="true"/>
+  <arg name="gui" default="true"/>
+  
+  <!-- ========================================= -->
+  <!-- GAZEBO WORLD                              -->
+  <!-- ========================================= -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="verbose" value="true"/>
+  </include>
+
+  <!-- ========================================= -->
+  <!-- SPAWN ROBOT                               -->
+  <!-- ========================================= -->
+  
+  <!-- Convert xacro to urdf -->
+  <param name="robot_description" 
+         command="$(find xacro)/xacro '$(find drone_project)/urdf/quadrotor.xacro'"/>
+  
+  <!-- Spawn robot in Gazebo -->
+  <node name="spawn_$(arg robot_name)" 
+        pkg="gazebo_ros" 
+        type="spawn_model"
+        args="-urdf -param robot_description -model $(arg robot_name) -x 0 -y 0 -z 0.5"
+        output="screen"/>
+  
+  <!-- Robot State Publisher -->
+  <node name="robot_state_publisher" 
+        pkg="robot_state_publisher" 
+        type="robot_state_publisher">
+    <param name="publish_frequency" value="50.0"/>
+  </node>
+
+  <!-- ========================================= -->
+  <!-- ROS NODES                                 -->
+  <!-- ========================================= -->
+  
+  <!-- Sensor Reader Node -->
+  <node name="sensor_reader" 
+        pkg="drone_project" 
+        type="sensor_reader.py" 
+        output="screen"/>
+
+  <!-- ========================================= -->
+  <!-- RVIZ (Optional)                           -->
+  <!-- ========================================= -->
+  <!-- Uncomment to enable RViz -->
+  <!--
+  <node name="rviz" 
+        pkg="rviz" 
+        type="rviz" 
+        args="-d $(find drone_project)/rviz/drone.rviz"/>
+  -->
+
+</launch>

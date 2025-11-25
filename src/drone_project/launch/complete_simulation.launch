@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- ========================================= -->
+  <!-- ARGUMENTS                                 -->
+  <!-- ========================================= -->
+  <arg name="world" default="empty"/>
+  <!-- Options: empty, obstacle, indoor -->
+  
+  <arg name="control_mode" default="keyboard"/>
+  <!-- Options: keyboard, autonomous -->
+
+  <!-- ========================================= -->
+  <!-- SET WORLD PATH                            -->
+  <!-- ========================================= -->
+  <arg name="world_file" 
+       value="$(find drone_project)/worlds/$(arg world).world"/>
+
+  <!-- ========================================= -->
+  <!-- LAUNCH SIMULATION                         -->
+  <!-- ========================================= -->
+  <include file="$(find drone_project)/launch/drone_simulation.launch">
+    <arg name="world_name" value="$(arg world_file)"/>
+  </include>
+
+  <!-- Wait for Gazebo to start -->
+  <arg name="wait_time" default="5"/>
+  <node pkg="rosservice" type="rosservice" name="wait_gazebo" 
+        args="call --wait /gazebo/unpause_physics"/>
+
+  <!-- ========================================= -->
+  <!-- LAUNCH CONTROL                            -->
+  <!-- ========================================= -->
+  <include file="$(find drone_project)/launch/drone_control.launch">
+    <arg name="control_mode" value="$(arg control_mode)"/>
+  </include>
+
+</launch>
